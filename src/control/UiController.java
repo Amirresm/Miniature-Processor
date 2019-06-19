@@ -1,8 +1,8 @@
 package control;
 
 import control.models.MemTableCell;
-import control.models.cpu.DataPathDriver;
-import control.models.cpu.Utility;
+import control.models.cpu.*;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
@@ -24,9 +24,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class UiController {
-    private String colorActive = "#66CC33";
-    private String colorDeactive = "#295214";
-
     private int stageNumber = 0;
 
     private String codeString = "";
@@ -108,6 +105,15 @@ public class UiController {
     @FXML
     private Label decodeBanner;
 
+    @FXML
+    private Button updateMemBt;
+
+    @FXML
+    private TextField changeAddrTf;
+
+    @FXML
+    private TextField changeValTf;
+
 //=======================================================
 
     Timer timer = new Timer();
@@ -118,7 +124,20 @@ public class UiController {
     public void initialize() {
         dataPathDriver = new DataPathDriver();
 
+        InstructionMem instructionMem = new InstructionMem();
+        ControlUnit control = new ControlUnit();
+        ALU alu = new ALU();
+
+        dataPathDriver.setInstructionMem(instructionMem);
+        dataPathDriver.setAlu(alu);
+        dataPathDriver.setControlUnit(control);
+        dataPathDriver.setMainMemory(new MainMemory());
+        dataPathDriver.setRegisterFile(new RegisterFile());
+
         initTableViews();
+
+        dataPathDriver.getRegisterFile().setUiMemList(rfList);
+        dataPathDriver.getMainMemory().setUiMemList(mmList);
     }
 
     @FXML
@@ -148,17 +167,19 @@ public class UiController {
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                for (int i = 0; i < 50; i++) {
-                    incrementBanner();
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                System.out.println("timer iterate...");
+                if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
+                    enableBanner(stageNumber);
+                    stageNumber = dataPathDriver.executeStage(stageNumber);
+                    Platform.runLater(() -> {
+                        rfTableView.refresh();
+                        mmTableView.refresh();
+                    });
+                } else
+                    t.cancel();
             }
         };
-        t.schedule(task, 0);
+        t.schedule(task, 0, 500);
     }
 
     @FXML
@@ -187,6 +208,13 @@ public class UiController {
         }
     }
 
+    @FXML
+    void updateMemAction(ActionEvent event) {
+        if ((changeValTf.getText().trim().length() > 0) && (changeAddrTf.getText().trim().length() > 0)) {
+            dataPathDriver.getMainMemory().predefineData(Long.parseLong(changeValTf.getText()), Integer.parseInt(changeAddrTf.getText()));
+            mmTableView.refresh();
+        }
+    }
 
     @FXML
     void loadButtonAction(ActionEvent event) {
@@ -220,6 +248,11 @@ public class UiController {
             MemTableCell cell = new MemTableCell(i, key, value);
             imList.add(cell);
         }
+        dataPathDriver.getInstructionMem().load(codeString);
+    }
+
+    void executeStage() {
+
     }
 
     void enableBanner(int id) {

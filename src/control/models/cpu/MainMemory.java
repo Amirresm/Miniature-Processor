@@ -1,5 +1,8 @@
 package control.models.cpu;
 
+import control.models.MemTableCell;
+import javafx.collections.ObservableList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +14,8 @@ public class MainMemory {
     private String address;
     private Signal memReadSignal;
     private Signal memWriteSignal;
+
+    private ObservableList<MemTableCell> uiMemList;
 
     public MainMemory() {
 
@@ -27,8 +32,10 @@ public class MainMemory {
     }
 
     public void writeData(String data) {
-        if (memWriteSignal.data == 1 && data.length() == 32)
+        if (memWriteSignal.data == 1 && data.length() == 32) {
             memoryMap.replace(address, data);
+            uiMemList.get(Integer.parseInt(address, 2)).setData(data);
+        }
     }
 
     public String readData() {
@@ -40,10 +47,21 @@ public class MainMemory {
     public void predefineData(String data, int numericalAddress) {
         String key = Utility.decimalToString(numericalAddress, mainMemBits);
         memoryMap.replace(key, data);
+        uiMemList.get(numericalAddress).setData(data);
     }
+
     public void predefineData(long data, int numericalAddress) {
         String key = Utility.decimalToString(numericalAddress, mainMemBits);
         String value = Utility.decimalToString(data, 32);
         memoryMap.replace(key, value);
+        uiMemList.get(numericalAddress).setData(value);
+    }
+
+    public ObservableList<MemTableCell> getUiMemList() {
+        return uiMemList;
+    }
+
+    public void setUiMemList(ObservableList<MemTableCell> uiMemList) {
+        this.uiMemList = uiMemList;
     }
 }

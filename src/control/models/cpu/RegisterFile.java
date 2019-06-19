@@ -1,5 +1,8 @@
 package control.models.cpu;
 
+import control.models.MemTableCell;
+import javafx.collections.ObservableList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +13,7 @@ public class RegisterFile {
     private String readAddr2;
     private String writeAddr;
     private boolean regWrite = Boolean.FALSE;
+    private ObservableList<MemTableCell> uiMemList;
 
     public RegisterFile() {
         registerMemory.put("0000", "00000000000000000000000000000000");
@@ -46,7 +50,17 @@ public class RegisterFile {
     }
 
     public void write(String registerWriteData) {
-        if (regWrite && registerWriteData.length() == 32)
+        if (regWrite && registerWriteData.length() == 32) {
             registerMemory.replace(writeAddr, registerWriteData);
+            uiMemList.get(Integer.parseInt(writeAddr, 2)).setData(registerWriteData);
+        }
+    }
+
+    public ObservableList<MemTableCell> getUiMemList() {
+        return uiMemList;
+    }
+
+    public void setUiMemList(ObservableList<MemTableCell> uiMemList) {
+        this.uiMemList = uiMemList;
     }
 }

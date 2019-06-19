@@ -62,7 +62,14 @@
                                           </HBox>
                                        </children>
                                     </VBox>
-                                    <Button fx:id="loadBt" mnemonicParsing="false" onAction="#loadButtonAction" text="Button" />
+                                    <Button fx:id="loadBt" mnemonicParsing="false" onAction="#loadButtonAction" text="Load machine code" />
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <TextField fx:id="changeValTf" promptText="Value" />
+                                          <TextField fx:id="changeAddrTf" promptText="Address" />
+                                          <Button fx:id="updateMemBt" ellipsisString="Update" mnemonicParsing="false" onAction="#updateMemAction" text="Update memory" />
+                                       </children>
+                                    </HBox>
                                  </children>
                               </VBox>
                            </children>

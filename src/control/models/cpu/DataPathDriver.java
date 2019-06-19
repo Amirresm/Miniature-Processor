@@ -7,6 +7,8 @@ public class DataPathDriver {
     private MainMemory mainMemory;
     private ALU alu;
 
+    private int stageIndicator = 0;
+
     //halt signal
     private Signal HALT = new Signal(0);
 
@@ -29,6 +31,10 @@ public class DataPathDriver {
 
     private String aluResult;
 
+    public DataPathDriver() {
+        pc = "0000000000000000";
+    }
+
     public String executeLine(String pc) {
         this.pc = pc;
         stageIF();
@@ -37,6 +43,35 @@ public class DataPathDriver {
         stageMEM();
         stageWB();
         return nextPc;
+    }
+
+    public int executeStage(int stageNumber) {
+        switch (stageNumber) {
+            case -1:
+                break;
+            case 0:
+                stageIF();
+                stageNumber++;
+                break;
+            case 1:
+                stageID();
+                stageNumber++;
+                break;
+            case 2:
+                stageEXE();
+                stageNumber++;
+                break;
+            case 3:
+                stageMEM();
+                stageNumber++;
+                break;
+            case 4:
+                stageWB();
+                stageNumber = 0;
+                this.pc = nextPc;
+                break;
+        }
+        return stageNumber;
     }
 
     private void stageIF() {
