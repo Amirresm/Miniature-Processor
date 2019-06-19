@@ -169,7 +169,12 @@ public class UiController {
             public void run() {
                 System.out.println("timer iterate...");
                 if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
-                    enableBanner(stageNumber);
+                    Platform.runLater(() -> {
+                        enableBanner(stageNumber);
+                        if(stageNumber == 0){
+                            imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(),2));
+                        }
+                    });
                     stageNumber = dataPathDriver.executeStage(stageNumber);
                     Platform.runLater(() -> {
                         rfTableView.refresh();
@@ -213,6 +218,10 @@ public class UiController {
         if ((changeValTf.getText().trim().length() > 0) && (changeAddrTf.getText().trim().length() > 0)) {
             dataPathDriver.getMainMemory().predefineData(Long.parseLong(changeValTf.getText()), Integer.parseInt(changeAddrTf.getText()));
             mmTableView.refresh();
+        }
+        System.out.println("data:");
+        for (MemTableCell cell : rfList) {
+            System.out.println(cell.getData());
         }
     }
 

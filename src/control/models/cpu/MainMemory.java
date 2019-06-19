@@ -34,7 +34,10 @@ public class MainMemory {
     public void writeData(String data) {
         if (memWriteSignal.data == 1 && data.length() == 32) {
             memoryMap.replace(address, data);
-            uiMemList.get(Integer.parseInt(address, 2)).setData(data);
+            int tableIndex = Integer.parseInt(address, 2);
+            MemTableCell cell = uiMemList.get(tableIndex);
+            cell.setData(data);
+            uiMemList.set(tableIndex, cell);
         }
     }
 
@@ -54,7 +57,10 @@ public class MainMemory {
         String key = Utility.decimalToString(numericalAddress, mainMemBits);
         String value = Utility.decimalToString(data, 32);
         memoryMap.replace(key, value);
-        uiMemList.get(numericalAddress).setData(value);
+        MemTableCell cell = uiMemList.get(numericalAddress);
+        cell.setData(value);
+        uiMemList.set(numericalAddress, cell);
+
     }
 
     public ObservableList<MemTableCell> getUiMemList() {

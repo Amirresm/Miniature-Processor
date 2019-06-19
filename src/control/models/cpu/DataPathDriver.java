@@ -176,4 +176,12 @@ public class DataPathDriver {
     public Signal getHALT() {
         return HALT;
     }
+
+    public String getPc() {
+        return pc;
+    }
+
+    public void setPc(String pc) {
+        this.pc = pc;
+    }
 }

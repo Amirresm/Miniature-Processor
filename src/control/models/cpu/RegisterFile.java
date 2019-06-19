@@ -52,7 +52,10 @@ public class RegisterFile {
     public void write(String registerWriteData) {
         if (regWrite && registerWriteData.length() == 32) {
             registerMemory.replace(writeAddr, registerWriteData);
-            uiMemList.get(Integer.parseInt(writeAddr, 2)).setData(registerWriteData);
+            int tableIndex = Integer.parseInt(writeAddr, 2);
+            MemTableCell cell = uiMemList.get(tableIndex);
+            cell.setData(registerWriteData);
+            uiMemList.set(tableIndex, cell);
         }
     }
 
