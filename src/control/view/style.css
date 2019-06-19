@@ -1,0 +1,16 @@
+.banner-deactive {
+    -fx-font-size:16;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-background-color: #295214;
+}
+.banner-active {
+    -fx-font-size:16;
+    -fx-font-weight: bold;
+    -fx-padding: 5px;
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-background-color: #66CC33;
+}
