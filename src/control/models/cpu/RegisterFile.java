@@ -37,6 +37,7 @@ public class RegisterFile {
             String value = "00000000000000000000000000000000";
             registerMemory.put(internalKey, value);
             MemTableCell cell = new MemTableCell(i, uiKey, value);
+            cell.setDecData(0);
             uiMemList.add(cell);
         }
     }
@@ -79,6 +80,7 @@ public class RegisterFile {
         int tableIndex = Integer.parseInt(addr, 2);
         MemTableCell cell = uiMemList.get(tableIndex);
         cell.setData(registerWriteData);
+        cell.setDecData(Integer.parseInt(registerWriteData, 2));
         uiMemList.set(tableIndex, cell);
     }
 }

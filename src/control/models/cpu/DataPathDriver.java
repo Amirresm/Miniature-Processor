@@ -45,33 +45,32 @@ public class DataPathDriver {
         return nextPc;
     }
 
-    public int executeStage(int stageNumber) {
-        switch (stageNumber) {
+    public void executeStage() {
+        switch (stageIndicator) {
             case -1:
                 break;
             case 0:
                 stageIF();
-                stageNumber++;
+                stageIndicator++;
                 break;
             case 1:
                 stageID();
-                stageNumber++;
+                stageIndicator++;
                 break;
             case 2:
                 stageEXE();
-                stageNumber++;
+                stageIndicator++;
                 break;
             case 3:
                 stageMEM();
-                stageNumber++;
+                stageIndicator++;
                 break;
             case 4:
                 stageWB();
-                stageNumber = 0;
+                stageIndicator = 0;
                 this.pc = nextPc;
                 break;
         }
-        return stageNumber;
     }
 
     private void stageIF() {
@@ -185,11 +184,15 @@ public class DataPathDriver {
         this.pc = pc;
     }
 
+    public int getStageIndicator() {
+        return stageIndicator;
+    }
+
     public void resetDriver() {
         pc = "0000000000000000";
         this.HALT.data = 0;
         this.stageIndicator = 0;
-        getMainMemory().resizeMemory(getMainMemory().getMemSize());
+//        getMainMemory().resizeMemory(getMainMemory().getMemSize());
         getRegisterFile().resizeMemory(getRegisterFile().getMemSize());
     }
 }

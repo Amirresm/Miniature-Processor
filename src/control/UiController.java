@@ -56,6 +56,9 @@ public class UiController {
     private TableColumn<String, MemTableCell> mmValCol;
 
     @FXML
+    private TableColumn<String, MemTableCell> mmDecValCol;
+
+    @FXML
     private Label wbBanner;
 
     @FXML
@@ -84,6 +87,9 @@ public class UiController {
 
     @FXML
     private TableColumn<String, MemTableCell> rfValCol;
+
+    @FXML
+    private TableColumn<String, MemTableCell> rfDecValCol;
 
     @FXML
     private TableColumn<String, MemTableCell> mmBinCol;
@@ -141,7 +147,7 @@ public class UiController {
         delaySlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                delayTf.setText((int)delaySlider.getValue() + "");
+                delayTf.setText((int) delaySlider.getValue() + "");
             }
         });
     }
@@ -150,34 +156,36 @@ public class UiController {
     void nextBtAction(ActionEvent event) {
         if (isWorking) {
             timer.cancel();
-            nextBt.setText("run");
+            nextBt.setText("Run");
             isWorking = false;
         } else {
-            if (!delayTf.getText().trim().isEmpty()) {
-                int delay = Integer.parseInt(delayTf.getText());
-                startDriverTimer(delay);
-                nextBt.setText("stop");
-                isWorking = true;
-            }
+            int delay = 500;
+            if (!delayTf.getText().trim().isEmpty())
+                delay = Integer.parseInt(delayTf.getText());
+            startDriverTimer(delay);
+            nextBt.setText("Stop");
+            isWorking = true;
+
         }
     }
 
-    void startDriverTimer(int delay) {
+    private void startDriverTimer(int delay) {
         timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                stageNumber = dataPathDriver.getStageIndicator();
                 System.out.println("timer iterate: STAGE = " + stageNumber);
                 System.out.println("PC = " + dataPathDriver.getPc());
                 if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
 //                    Platform.runLater(() -> {
-                        enableBanner(stageNumber);
-                        if (stageNumber == 0) {
-                            imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(), 2));
-                        }
+                    if (stageNumber == 0) {
+                        imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(), 2));
+                    }
 //                    });
-                    stageNumber = dataPathDriver.executeStage(stageNumber);
+                    dataPathDriver.executeStage();
                     Platform.runLater(() -> {
+                        enableBanner(stageNumber);
                         rfTableView.refresh();
                         mmTableView.refresh();
                     });
@@ -193,6 +201,7 @@ public class UiController {
     @FXML
     void resetAction(ActionEvent event) {
         dataPathDriver.resetDriver();
+        enableBanner(-1);
     }
 
     @FXML
@@ -331,11 +340,13 @@ public class UiController {
         rfDecCol.setCellValueFactory(new PropertyValueFactory<>("row"));
         rfBinCol.setCellValueFactory(new PropertyValueFactory<>("index"));
         rfValCol.setCellValueFactory(new PropertyValueFactory<>("data"));
+        rfDecValCol.setCellValueFactory(new PropertyValueFactory<>("decData"));
         rfTableView.setItems(rfList);
 
         mmDecCol.setCellValueFactory(new PropertyValueFactory<>("row"));
         mmBinCol.setCellValueFactory(new PropertyValueFactory<>("index"));
         mmValCol.setCellValueFactory(new PropertyValueFactory<>("data"));
+        mmDecValCol.setCellValueFactory(new PropertyValueFactory<>("decData"));
         mmTableView.setItems(mmList);
     }
 }

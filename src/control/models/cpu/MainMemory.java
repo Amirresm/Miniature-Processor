@@ -35,6 +35,7 @@ public class MainMemory {
             String value = "00000000000000000000000000000000";
             memoryMap.put(internalKey, value);
             MemTableCell cell = new MemTableCell(i, uiKey, value);
+            cell.setDecData(0);
             uiMemList.add(cell);
         }
     }
@@ -91,6 +92,7 @@ public class MainMemory {
         int tableIndex = Integer.parseInt(addr, 2);
         MemTableCell cell = uiMemList.get(tableIndex);
         cell.setData(registerWriteData);
+        cell.setDecData(Integer.parseInt(registerWriteData, 2));
         uiMemList.set(tableIndex, cell);
     }
 
@@ -103,6 +105,7 @@ public class MainMemory {
             memoryMap.put(key, value);
         MemTableCell cell = uiMemList.get(addr);
         cell.setData(value);
+        cell.setDecData((int)registerWriteData);
         uiMemList.set(addr, cell);
     }
 }
