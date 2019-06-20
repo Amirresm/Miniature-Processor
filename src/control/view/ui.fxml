@@ -29,20 +29,24 @@
          <items>
             <SplitPane>
                <items>
-                  <SplitPane dividerPositions="0.9805">
+                  <SplitPane dividerPositions="0.5">
                      <items>
-                        <AnchorPane maxWidth="800.0" minWidth="800.0" prefHeight="0.0" prefWidth="800.0">
+                        <HBox alignment="CENTER" minHeight="-Infinity" minWidth="-Infinity" style="-fx-background-color: white;">
                            <children>
-                              <ImageView fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@images/datapath.png" />
-                                 </image>
-                              </ImageView>
+                              <AnchorPane minWidth="800.0" prefHeight="0.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" SplitPane.resizableWithParent="false">
+                                 <children>
+                                    <ImageView fitWidth="800.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@images/datapath.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </AnchorPane>
                            </children>
-                        </AnchorPane>
+                        </HBox>
                         <AnchorPane prefWidth="200.0">
                            <children>
-                              <VBox alignment="TOP_CENTER" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                              <VBox alignment="TOP_CENTER" minWidth="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                  <children>
                                     <HBox alignment="CENTER_LEFT">
                                        <children>
@@ -50,12 +54,13 @@
                                           <Button fx:id="nextBt" mnemonicParsing="false" onAction="#nextBtAction" text="run" />
                                        </children>
                                     </HBox>
-                                    <Button mnemonicParsing="false" onAction="#goNext" text="next" />
+                                    <Slider fx:id="delaySlider" majorTickUnit="500.0" max="2050.0" min="50.0" minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                                    <Button mnemonicParsing="false" onAction="#resetAction" text="next" />
                                     <VBox alignment="CENTER">
                                        <children>
                                           <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
                                              <children>
-                                                <TextField fx:id="regSizeTf" promptText="Reg size" />
+                                                <TextField fx:id="regSizeTf" promptText="Reg size" HBox.hgrow="ALWAYS" />
                                                 <TextField fx:id="memSizeTf" promptText="Memory size" />
                                                 <Button fx:id="setBt" ellipsisString="Set" mnemonicParsing="false" onAction="#setMemAction" text="Set Memories" />
                                              </children>
@@ -65,7 +70,7 @@
                                     <Button fx:id="loadBt" mnemonicParsing="false" onAction="#loadButtonAction" text="Load machine code" />
                                     <HBox alignment="CENTER">
                                        <children>
-                                          <TextField fx:id="changeValTf" promptText="Value" />
+                                          <TextField fx:id="changeValTf" promptText="Value" HBox.hgrow="ALWAYS" />
                                           <TextField fx:id="changeAddrTf" promptText="Address" />
                                           <Button fx:id="updateMemBt" ellipsisString="Update" mnemonicParsing="false" onAction="#updateMemAction" text="Update memory" />
                                        </children>
@@ -99,19 +104,19 @@
                            <children>
                               <SplitPane dividerPositions="0.797808764940239" HBox.hgrow="ALWAYS">
                                  <items>
-                                    <SplitPane dividerPositions="0.29850746268656714, 0.6579601990049752" maxWidth="800.0" minWidth="800.0" HBox.hgrow="ALWAYS">
+                                    <SplitPane dividerPositions="0.29850746268656714, 0.6579601990049752" minWidth="800.0" HBox.hgrow="ALWAYS">
                                       <items>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                              <children>
                                                 <TableView fx:id="imTableView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                   <columns>
-                                                    <TableColumn editable="false" prefWidth="71.0" sortable="false" text="Index">
+                                                    <TableColumn editable="false" prefWidth="50.0" sortable="false" text="Index">
                                                          <columns>
-                                                            <TableColumn fx:id="imDecCol" editable="false" prefWidth="75.0" sortable="false" text="Decimal" />
-                                                            <TableColumn fx:id="imBinCol" editable="false" prefWidth="75.0" sortable="false" text="Binary" />
+                                                            <TableColumn fx:id="imDecCol" editable="false" maxWidth="40.0" minWidth="25.0" prefWidth="30.0" sortable="false" text="Decimal" />
+                                                            <TableColumn fx:id="imBinCol" editable="false" maxWidth="200.0" minWidth="50.0" prefWidth="75.0" sortable="false" text="Binary" />
                                                          </columns>
                                                       </TableColumn>
-                                                    <TableColumn fx:id="imValCol" editable="false" prefWidth="143.888916015625" sortable="false" text="Value" />
+                                                    <TableColumn fx:id="imValCol" editable="false" minWidth="150.0" prefWidth="300.0" sortable="false" text="Value" />
                                                   </columns>
                                                    <columnResizePolicy>
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -123,13 +128,13 @@
                                              <children>
                                                 <TableView fx:id="rfTableView" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                                   <columns>
-                                                      <TableColumn editable="false" prefWidth="75.0" sortable="false" text="Index">
+                                                      <TableColumn editable="false" prefWidth="96.0" sortable="false" text="Index">
                                                          <columns>
-                                                            <TableColumn fx:id="rfDecCol" editable="false" prefWidth="75.0" sortable="false" text="Decimal" />
-                                                            <TableColumn fx:id="rfBinCol" editable="false" prefWidth="75.0" sortable="false" text="Binary" />
+                                                            <TableColumn fx:id="rfDecCol" editable="false" maxWidth="40.0" minWidth="25.0" prefWidth="30.0" sortable="false" text="Decimal" />
+                                                            <TableColumn fx:id="rfBinCol" editable="false" maxWidth="200.0" minWidth="50.0" prefWidth="75.0" sortable="false" text="Binary" />
                                                          </columns>
                                                       </TableColumn>
-                                                    <TableColumn fx:id="rfValCol" editable="false" prefWidth="75.0" sortable="false" text="Value" />
+                                                    <TableColumn fx:id="rfValCol" editable="false" minWidth="150.0" prefWidth="300.0" sortable="false" text="Value" />
                                                   </columns>
                                                    <columnResizePolicy>
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -143,11 +148,11 @@
                                                   <columns>
                                                       <TableColumn editable="false" prefWidth="75.0" sortable="false" text="Index">
                                                          <columns>
-                                                            <TableColumn fx:id="mmDecCol" editable="false" prefWidth="75.0" sortable="false" text="Decimal" />
-                                                            <TableColumn fx:id="mmBinCol" editable="false" prefWidth="75.0" sortable="false" text="Binary" />
+                                                            <TableColumn fx:id="mmDecCol" editable="false" maxWidth="40.0" minWidth="25.0" prefWidth="30.0" sortable="false" text="Decimal" />
+                                                            <TableColumn fx:id="mmBinCol" editable="false" maxWidth="200.0" minWidth="50.0" prefWidth="75.0" sortable="false" text="Binary" />
                                                          </columns>
                                                       </TableColumn>
-                                                    <TableColumn fx:id="mmValCol" editable="false" prefWidth="75.0" sortable="false" text="Value" />
+                                                    <TableColumn fx:id="mmValCol" editable="false" minWidth="150.0" prefWidth="300.0" sortable="false" text="Value" />
                                                   </columns>
                                                    <columnResizePolicy>
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -157,7 +162,7 @@
                                           </AnchorPane>
                                       </items>
                                     </SplitPane>
-                                    <AnchorPane prefWidth="200.0" />
+                                    <AnchorPane minWidth="200.0" prefWidth="200.0" />
                                  </items>
                               </SplitPane>
                            </children>

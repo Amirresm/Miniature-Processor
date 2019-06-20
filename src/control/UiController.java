@@ -3,21 +3,19 @@ package control;
 import control.models.MemTableCell;
 import control.models.cpu.*;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.rmi.server.ExportException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -114,9 +112,13 @@ public class UiController {
     @FXML
     private TextField changeValTf;
 
+    @FXML
+    private Slider delaySlider;
+
 //=======================================================
 
     Timer timer = new Timer();
+
     boolean isWorking = false;
 
 
@@ -128,16 +130,20 @@ public class UiController {
         ControlUnit control = new ControlUnit();
         ALU alu = new ALU();
 
+        initTableViews();
+
         dataPathDriver.setInstructionMem(instructionMem);
         dataPathDriver.setAlu(alu);
         dataPathDriver.setControlUnit(control);
-        dataPathDriver.setMainMemory(new MainMemory());
-        dataPathDriver.setRegisterFile(new RegisterFile());
+        dataPathDriver.setRegisterFile(new RegisterFile(rfList));
+        dataPathDriver.setMainMemory(new MainMemory(mmList));
 
-        initTableViews();
-
-        dataPathDriver.getRegisterFile().setUiMemList(rfList);
-        dataPathDriver.getMainMemory().setUiMemList(mmList);
+        delaySlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                delayTf.setText((int)delaySlider.getValue() + "");
+            }
+        });
     }
 
     @FXML
@@ -147,69 +153,73 @@ public class UiController {
             nextBt.setText("run");
             isWorking = false;
         } else {
-            timer = new Timer();
-            TimerTask task = new TimerTask() {
-                @Override
-                public void run() {
-                    incrementBanner();
-                }
-            };
-            timer.schedule(task, Integer.parseInt(delayTf.getText()), Integer.parseInt(delayTf.getText()));
-            nextBt.setText("stop");
-            isWorking = true;
+            if (!delayTf.getText().trim().isEmpty()) {
+                int delay = Integer.parseInt(delayTf.getText());
+                startDriverTimer(delay);
+                nextBt.setText("stop");
+                isWorking = true;
+            }
         }
     }
 
-    @FXML
-    void goNext(ActionEvent event) {
-
-        Timer t = new Timer();
+    void startDriverTimer(int delay) {
+        timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                System.out.println("timer iterate...");
+                System.out.println("timer iterate: STAGE = " + stageNumber);
+                System.out.println("PC = " + dataPathDriver.getPc());
                 if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
-                    Platform.runLater(() -> {
+//                    Platform.runLater(() -> {
                         enableBanner(stageNumber);
-                        if(stageNumber == 0){
-                            imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(),2));
+                        if (stageNumber == 0) {
+                            imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(), 2));
                         }
-                    });
+//                    });
                     stageNumber = dataPathDriver.executeStage(stageNumber);
                     Platform.runLater(() -> {
                         rfTableView.refresh();
                         mmTableView.refresh();
                     });
-                } else
-                    t.cancel();
+                } else {
+                    timer.cancel();
+                    enableBanner(-1);
+                }
             }
         };
-        t.schedule(task, 0, 500);
+        timer.schedule(task, 0, delay);
+    }
+
+    @FXML
+    void resetAction(ActionEvent event) {
+        dataPathDriver.resetDriver();
     }
 
     @FXML
     void setMemAction(ActionEvent event) {
         if (regSizeTf.getText().trim().length() > 0) {//TODO: try-catch
             int regSize = Integer.parseInt(regSizeTf.getText());
-            int radix = (int) Math.sqrt(regSize) + 1;
-            rfList.clear();
-            for (int i = 0; i < regSize; i++) {
-                String key = Utility.decimalToString(i, radix);
-                String value = "00000000000000000000000000000000";
-                MemTableCell cell = new MemTableCell(i, key, value);
-                rfList.add(cell);
-            }
+            dataPathDriver.getRegisterFile().resizeMemory(regSize);
+//            int radix = (int) Math.sqrt(regSize - 1) + 1;
+//            rfList.clear();
+//            for (int i = 0; i < regSize; i++) {
+//                String key = Utility.decimalToString(i, radix);
+//                String value = "00000000000000000000000000000000";
+//                MemTableCell cell = new MemTableCell(i, key, value);
+//                rfList.add(cell);
+//            }
         }
         if (memSizeTf.getText().trim().length() > 0) {//TODO: try-catch
             int memSize = Integer.parseInt(memSizeTf.getText());
-            int radix = (int) Math.sqrt(memSize) + 1;
-            mmList.clear();
-            for (int i = 0; i < memSize; i++) {
-                String key = Utility.decimalToString(i, radix);
-                String value = "00000000000000000000000000000000";
-                MemTableCell cell = new MemTableCell(i, key, value);
-                mmList.add(cell);
-            }
+            dataPathDriver.getMainMemory().resizeMemory(memSize);
+//            int radix = (int) Math.sqrt(memSize - 1) + 1;
+//            mmList.clear();
+//            for (int i = 0; i < memSize; i++) {
+//                String key = Utility.decimalToString(i, radix);
+//                String value = "00000000000000000000000000000000";
+//                MemTableCell cell = new MemTableCell(i, key, value);
+//                mmList.add(cell);
+//            }
         }
     }
 
@@ -260,11 +270,9 @@ public class UiController {
         dataPathDriver.getInstructionMem().load(codeString);
     }
 
-    void executeStage() {
-
-    }
 
     void enableBanner(int id) {
+        System.out.println("banner number " + (id + 1));
         fetchBanner.getStyleClass().remove("banner-active");
         fetchBanner.getStyleClass().add("banner-deactive");
         decodeBanner.getStyleClass().remove("banner-active");

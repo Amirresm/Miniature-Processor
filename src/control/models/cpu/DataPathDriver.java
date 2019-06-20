@@ -184,4 +184,12 @@ public class DataPathDriver {
     public void setPc(String pc) {
         this.pc = pc;
     }
+
+    public void resetDriver() {
+        pc = "0000000000000000";
+        this.HALT.data = 0;
+        this.stageIndicator = 0;
+        getMainMemory().resizeMemory(getMainMemory().getMemSize());
+        getRegisterFile().resizeMemory(getRegisterFile().getMemSize());
+    }
 }

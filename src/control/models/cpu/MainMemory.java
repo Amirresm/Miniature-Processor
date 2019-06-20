@@ -8,7 +8,6 @@ import java.util.Map;
 
 public class MainMemory {
     final static int mainMemBits = 32;
-    int memSize = 50;
 
     public Map<String, String> memoryMap = new HashMap<>();
     private String address;
@@ -16,12 +15,27 @@ public class MainMemory {
     private Signal memWriteSignal;
 
     private ObservableList<MemTableCell> uiMemList;
+    private int memSize;
 
-    public MainMemory() {
+    public MainMemory(ObservableList<MemTableCell> uiMemList) {
+        this.uiMemList = uiMemList;
+        resizeMemory(64);
+    }
 
-        for (int i = 0; i < memSize; i++) {
-            String key = String.format("%" + mainMemBits + "s", Integer.toBinaryString(i)).replace(' ', '0');
-            memoryMap.put(key, "00000000000000000000000000000000");
+    public void resizeMemory(int memorySize) {
+        this.memSize = memorySize;
+        if (memorySize < 0)
+            memorySize = 0;
+
+        int radix = (int) Math.sqrt(memorySize - 1) + 1;
+        uiMemList.clear();
+        for (int i = 0; i < memorySize; i++) {
+            String internalKey = Utility.decimalToString(i, mainMemBits);
+            String uiKey = Utility.decimalToString(i, radix);
+            String value = "00000000000000000000000000000000";
+            memoryMap.put(internalKey, value);
+            MemTableCell cell = new MemTableCell(i, uiKey, value);
+            uiMemList.add(cell);
         }
     }
 
@@ -33,11 +47,12 @@ public class MainMemory {
 
     public void writeData(String data) {
         if (memWriteSignal.data == 1 && data.length() == 32) {
-            memoryMap.replace(address, data);
-            int tableIndex = Integer.parseInt(address, 2);
-            MemTableCell cell = uiMemList.get(tableIndex);
-            cell.setData(data);
-            uiMemList.set(tableIndex, cell);
+//            memoryMap.replace(address, data);
+//            int tableIndex = Integer.parseInt(address, 2);
+//            MemTableCell cell = uiMemList.get(tableIndex);
+//            cell.setData(data);
+//            uiMemList.set(tableIndex, cell);
+            putInMemory(address, data);
         }
     }
 
@@ -54,20 +69,40 @@ public class MainMemory {
     }
 
     public void predefineData(long data, int numericalAddress) {
-        String key = Utility.decimalToString(numericalAddress, mainMemBits);
-        String value = Utility.decimalToString(data, 32);
-        memoryMap.replace(key, value);
-        MemTableCell cell = uiMemList.get(numericalAddress);
+//        String key = Utility.decimalToString(numericalAddress, mainMemBits);
+//        String value = Utility.decimalToString(data, 32);
+//        memoryMap.replace(key, value);
+//        MemTableCell cell = uiMemList.get(numericalAddress);
+//        cell.setData(value);
+//        uiMemList.set(numericalAddress, cell);
+        putInMemory(numericalAddress, data);
+
+    }
+
+    public int getMemSize() {
+        return memSize;
+    }
+
+    private void putInMemory(String addr, String registerWriteData) {
+        if (memoryMap.containsKey(addr))
+            memoryMap.replace(addr, registerWriteData);
+        else
+            memoryMap.put(addr, registerWriteData);
+        int tableIndex = Integer.parseInt(addr, 2);
+        MemTableCell cell = uiMemList.get(tableIndex);
+        cell.setData(registerWriteData);
+        uiMemList.set(tableIndex, cell);
+    }
+
+    private void putInMemory(int addr, long registerWriteData) {
+        String key = Utility.decimalToString(addr, mainMemBits);
+        String value = Utility.decimalToString(registerWriteData, 32);
+        if (memoryMap.containsKey(key))
+            memoryMap.replace(key, value);
+        else
+            memoryMap.put(key, value);
+        MemTableCell cell = uiMemList.get(addr);
         cell.setData(value);
-        uiMemList.set(numericalAddress, cell);
-
-    }
-
-    public ObservableList<MemTableCell> getUiMemList() {
-        return uiMemList;
-    }
-
-    public void setUiMemList(ObservableList<MemTableCell> uiMemList) {
-        this.uiMemList = uiMemList;
+        uiMemList.set(addr, cell);
     }
 }
