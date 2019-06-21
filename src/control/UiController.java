@@ -123,9 +123,9 @@ public class UiController {
 
 //=======================================================
 
-    Timer timer = new Timer();
+    private Timer timer;
 
-    boolean isWorking = false;
+    private boolean isWorking = false;
 
 
     @FXML
@@ -156,6 +156,7 @@ public class UiController {
     void nextBtAction(ActionEvent event) {
         if (isWorking) {
             timer.cancel();
+            timer.purge();
             nextBt.setText("Run");
             isWorking = false;
         } else {

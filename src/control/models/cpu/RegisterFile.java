@@ -80,7 +80,7 @@ public class RegisterFile {
         int tableIndex = Integer.parseInt(addr, 2);
         MemTableCell cell = uiMemList.get(tableIndex);
         cell.setData(registerWriteData);
-        cell.setDecData(Integer.parseInt(registerWriteData, 2));
+        cell.setDecData((int)Long.parseLong(registerWriteData, 2));
         uiMemList.set(tableIndex, cell);
     }
 }
