@@ -60,7 +60,7 @@ public class MainMemory {
     public String readData() {
         if (memReadSignal.data == 1)
             return memoryMap.get(address);
-        else return "";
+        else return "0";
     }
 
     public void predefineData(String data, int numericalAddress) {

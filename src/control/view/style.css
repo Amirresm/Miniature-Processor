@@ -17,10 +17,46 @@
 }
 
 
-.table-cell{
+.signal-enabled {
+    -fx-background-color: rgb(255, 96, 0);
+    -fx-background-radius: 5px;
+    -fx-background-insets: 1px;
+    -fx-text-fill: #8e3e00;
+    -fx-font-size: 9px;
+    -fx-border-radius: 5px;
+    -fx-border-insets: 1px;
+}
+
+.signal-disabled {
+    -fx-background-color: #927865;
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1px;
+    -fx-text-fill: #49382a;
+    -fx-font-size: 9px;
+    -fx-font-weight: normal;
+    -fx-border-color: transparent;
+}
+
+.circle-signal-enabled {
+    -fx-fill: #e53607;
+    -fx-stroke: #2C0303;
+}
+
+.circle-signal-disabled {
+    -fx-fill: #66544e;
+    -fx-stroke: transparent;
+}
+
+.signal-alu {
+    -fx-background-color: rgba(0, 122, 57, 0.88);
+    -fx-background-radius: 3px;
+    -fx-background-insets: 1px;
+    -fx-text-fill: #20e508;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+}
+
+.table-cell {
     -fx-font-size: 10px;
 }
 
-/*.table-row-cell:hover{*/
-    /*-fx-font-size: 10px;*/
-/*}*/

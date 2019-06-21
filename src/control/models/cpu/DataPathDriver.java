@@ -1,5 +1,7 @@
 package control.models.cpu;
 
+import control.models.GuiDataHolder;
+
 public class DataPathDriver {
     private InstructionMem instructionMem;
     private ControlUnit controlUnit;
@@ -7,6 +9,7 @@ public class DataPathDriver {
     private MainMemory mainMemory;
     private ALU alu;
 
+    private GuiDataHolder uiHolder;
     private int stageIndicator = 0;
 
     //halt signal
@@ -76,6 +79,11 @@ public class DataPathDriver {
     private void stageIF() {
         instruction = instructionMem.getInstruction(pc);
         nextPc = Adder.compute(pc, "00000000000000000000000000000001"); //pc + 1
+
+        //gui
+        uiHolder.setPc(pc);
+        uiHolder.setPcPOne(nextPc);
+        uiHolder.instruction = instruction;
     }
 
     private void stageID() {
@@ -103,6 +111,49 @@ public class DataPathDriver {
 
         //extend the offset value
         extendedOffset = Extendor.singExtend(immValue);
+
+        //GUI----------------------------------------------
+        uiHolder.oppCode = oppCode;
+        uiHolder.rs = (regAddr1);
+        uiHolder.rt = (regAddr2);
+        uiHolder.rd = (regWAddr);
+        uiHolder.offset = immValue;
+        uiHolder.jump = jumpValue;
+
+        uiHolder.setRegRead1(regAddr1);
+        uiHolder.setRegRead2(regAddr2);
+        uiHolder.setWriteReg(regWAddr);
+
+        uiHolder.setReadData1(regReadData1);
+        uiHolder.setReadData2(regReadData2);
+
+        uiHolder.regDest = controlUnit.REGDES.isOn();
+        uiHolder.jumpSignal = controlUnit.JUMP.isOn();
+        uiHolder.branch = controlUnit.BRANCH.isOn();
+        uiHolder.memToReg = controlUnit.MEMTOREG.isOn();
+        uiHolder.memWrite = controlUnit.MEMWRITE.isOn();
+        uiHolder.memRead = controlUnit.MEMREAD.isOn();
+        uiHolder.aluSrc = controlUnit.ALUSRC.isOn();
+        uiHolder.regWrite = controlUnit.REGWRITE.isOn();
+        switch (controlUnit.ALUOP.data)
+        {
+            case 1:
+                uiHolder.aluOp = "add";
+                break;
+            case 2:
+                uiHolder.aluOp = "sub";
+                break;
+            case 3:
+                uiHolder.aluOp = "slt";
+                break;
+            case 4:
+                uiHolder.aluOp = "or";
+                break;
+            case 5:
+                uiHolder.aluOp = "and";
+                break;
+        }
+        //----------------------------------------------
     }
 
     private void stageEXE() {
@@ -119,17 +170,31 @@ public class DataPathDriver {
         Signal branchSignal = AndUnit.and(alu.getZeroSignal(), controlUnit.BRANCH);
         nextPc = Mux.compute(nextPc, pcPlusOffset, branchSignal);
         nextPc = Mux.compute(nextPc, jumpAddr, controlUnit.JUMP);
+
+        //GUI----------------------------------------------
+        uiHolder.aluZero = alu.getZeroSignal().isOn();
+        uiHolder.setAluResult(aluResult);
+        uiHolder.branchANDZero = branchSignal.isOn();
+        uiHolder.setBranchPc(pcPlusOffset);
+        uiHolder.setNextPc(nextPc);
     }
 
     private void stageMEM() {
         mainMemory.setup(aluResult, controlUnit.MEMREAD, controlUnit.MEMWRITE);
         mainMemory.writeData(regReadData2);
         mainMemoryRead = mainMemory.readData();
+
+        //GUI----------------------------------------------
+        uiHolder.setMemoryWrite(regReadData2);
+        uiHolder.setMemory(mainMemoryRead);
     }
 
     private void stageWB() {
         String registerWriteData = Mux.compute(aluResult, mainMemoryRead, controlUnit.MEMTOREG);                //mux TODO: flag = MEMTOREG
         registerFile.write(registerWriteData);
+
+        //GUI----------------------------------------------
+        uiHolder.setWriteData(registerWriteData);
     }
 
     public InstructionMem getInstructionMem() {
@@ -186,6 +251,14 @@ public class DataPathDriver {
 
     public int getStageIndicator() {
         return stageIndicator;
+    }
+
+    public GuiDataHolder getUiHolder() {
+        return uiHolder;
+    }
+
+    public void setUiHolder(GuiDataHolder uiHolder) {
+        this.uiHolder = uiHolder;
     }
 
     public void resetDriver() {
