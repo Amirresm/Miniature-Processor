@@ -304,7 +304,7 @@ public class UiController {
         dataPathDriver.setRegisterFile(new RegisterFile(rfList));
         dataPathDriver.setMainMemory(new MainMemory(mmList));
 
-        delaySlider.valueProperty().addListener(new ChangeListener<Number>() {
+        delaySlider.valueProperty().addListener(new ChangeListener<>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 delayTf.setText((int) delaySlider.getValue() + "");
@@ -382,26 +382,10 @@ public class UiController {
         if (regSizeTf.getText().trim().length() > 0) {//TODO: try-catch
             int regSize = Integer.parseInt(regSizeTf.getText());
             dataPathDriver.getRegisterFile().resizeMemory(regSize);
-//            int radix = (int) Math.sqrt(regSize - 1) + 1;
-//            rfList.clear();
-//            for (int i = 0; i < regSize; i++) {
-//                String key = Utility.decimalToString(i, radix);
-//                String value = "00000000000000000000000000000000";
-//                MemTableCell cell = new MemTableCell(i, key, value);
-//                rfList.add(cell);
-//            }
         }
         if (memSizeTf.getText().trim().length() > 0) {//TODO: try-catch
             int memSize = Integer.parseInt(memSizeTf.getText());
             dataPathDriver.getMainMemory().resizeMemory(memSize);
-//            int radix = (int) Math.sqrt(memSize - 1) + 1;
-//            mmList.clear();
-//            for (int i = 0; i < memSize; i++) {
-//                String key = Utility.decimalToString(i, radix);
-//                String value = "00000000000000000000000000000000";
-//                MemTableCell cell = new MemTableCell(i, key, value);
-//                mmList.add(cell);
-//            }
         }
     }
 
@@ -422,38 +406,41 @@ public class UiController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open project");
         File file = fileChooser.showOpenDialog(loadBt.getScene().getWindow());
-        List<String> instructions = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            StringBuilder sb = new StringBuilder();
-            String line = br.readLine();
+        if(file != null) {
+            List<String> instructions = new ArrayList<>();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                StringBuilder sb = new StringBuilder();
+                String line = br.readLine();
 
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                int value = Integer.parseInt(line);//TODO: check for errors
-                instructions.add(String.format("%" + 32 + "s", Integer.toBinaryString(value)).replace(' ', '0'));
-                line = br.readLine();
+                while (line != null) {
+                    sb.append(line);
+                    sb.append(System.lineSeparator());
+                    int value = Integer.parseInt(line);//TODO: check for errors
+                    instructions.add(String.format("%" + 32 + "s", Integer.toBinaryString(value)).replace(' ', '0'));
+                    line = br.readLine();
+                }
+                codeString = sb.toString();
+                br.close();
+            } catch (Exception ignored) {
             }
-            codeString = sb.toString();
-            br.close();
-        } catch (Exception e) {
-        }
 
-        int imSize = instructions.size();
-        int radix = (int) Math.sqrt(imSize) + 1;
-        imList.clear();
-        for (int i = 0; i < imSize; i++) {
-            String key = Utility.decimalToString(i, radix);
-            String value = instructions.get(i);
-            MemTableCell cell = new MemTableCell(i, key, value);
-            imList.add(cell);
+
+            int imSize = instructions.size();
+            int radix = (int) Math.sqrt(imSize) + 1;
+            imList.clear();
+            for (int i = 0; i < imSize; i++) {
+                String key = Utility.decimalToString(i, radix);
+                String value = instructions.get(i);
+                MemTableCell cell = new MemTableCell(i, key, value);
+                imList.add(cell);
+            }
+            dataPathDriver.getInstructionMem().load(codeString);
         }
-        dataPathDriver.getInstructionMem().load(codeString);
     }
 
 
-    void enableBanner(int id) {
+    private void enableBanner(int id) {
         System.out.println("banner number " + (id + 1));
         fetchBanner.getStyleClass().remove("banner-active");
         fetchBanner.getStyleClass().add("banner-deactive");
@@ -568,21 +555,21 @@ public class UiController {
 //            node.getStyleClass().remove(disableStyle);
 //            node.getStyleClass().add(enableStyle);
             node.setStyle(enableStyle);
-            if (type == "circle") {
+            if (type.equals("circle")) {
                 ((Circle) node).setRadius(5);
             }
         } else {
             node.setStyle(disableStyle);
 //            node.getStyleClass().remove(enableStyle);
 //            node.getStyleClass().add(disableStyle);
-            if (type == "circle") {
+            if (type.equals("circle")) {
                 ((Circle) node).setRadius(3);
             }
         }
     }
 
 
-    void initTableViews() {
+    private void initTableViews() {
         imList = FXCollections.observableArrayList();
         rfList = FXCollections.observableArrayList();
         mmList = FXCollections.observableArrayList();

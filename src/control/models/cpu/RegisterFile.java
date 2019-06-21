@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterFile {
-    public Map<String, String> registerMemory = new HashMap<>();
+    private Map<String, String> registerMemory = new HashMap<>();
 
     private String readAddr1;
     private String readAddr2;
@@ -42,33 +42,28 @@ public class RegisterFile {
         }
     }
 
-    public void setup(String readAddr1, String readAddr2, String writeAddr, Signal flag) {
+    void setup(String readAddr1, String readAddr2, String writeAddr, Signal flag) {
         this.readAddr1 = readAddr1;
         this.readAddr2 = readAddr2;
         this.writeAddr = writeAddr;
-        regWrite = flag.data == 1 ? true : false;
+        regWrite = flag.data == 1;
     }
 
-    public String getFirstData() {
+    String getFirstData() {
         return registerMemory.get(readAddr1);
     }
 
-    public String getSecondData() {
+    String getSecondData() {
         return registerMemory.get(readAddr2);
     }
 
-    public void write(String registerWriteData) {
+    void write(String registerWriteData) {
         if (regWrite && registerWriteData.length() == 32) {
-//            registerMemory.replace(writeAddr, registerWriteData);
-//            int tableIndex = Integer.parseInt(writeAddr, 2);
-//            MemTableCell cell = uiMemList.get(tableIndex);
-//            cell.setData(registerWriteData);
-//            uiMemList.set(tableIndex, cell);
             putInMemory(writeAddr, registerWriteData);
         }
     }
 
-    public int getMemSize() {
+    int getMemSize() {
         return memSize;
     }
 

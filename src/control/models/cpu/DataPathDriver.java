@@ -87,7 +87,7 @@ public class DataPathDriver {
     }
 
     private void stageID() {
-        //decoding the instruction TODO: fix for miniature processor
+        //decoding the instruction
         oppCode = instruction.substring(4, 8);        // oppCode
         regAddr1 = instruction.substring(8, 12);    // R-rt
         regAddr2 = instruction.substring(12, 16);    // R-rs
@@ -104,8 +104,8 @@ public class DataPathDriver {
             HALT.data = 1;
 
         //setup register file
-        String writeRegisterMux = Mux.compute(regAddr2, regWAddr, controlUnit.REGDES);                        //mux TODO: flag = REGDST
-        registerFile.setup(regAddr1, regAddr2, writeRegisterMux, controlUnit.REGWRITE);                         //TODO: flag = REGWRITE
+        String writeRegisterMux = Mux.compute(regAddr2, regWAddr, controlUnit.REGDES);
+        registerFile.setup(regAddr1, regAddr2, writeRegisterMux, controlUnit.REGWRITE);
         regReadData1 = registerFile.getFirstData();
         regReadData2 = registerFile.getSecondData();
 
@@ -190,7 +190,7 @@ public class DataPathDriver {
     }
 
     private void stageWB() {
-        String registerWriteData = Mux.compute(aluResult, mainMemoryRead, controlUnit.MEMTOREG);                //mux TODO: flag = MEMTOREG
+        String registerWriteData = Mux.compute(aluResult, mainMemoryRead, controlUnit.MEMTOREG);
         registerFile.write(registerWriteData);
 
         //GUI----------------------------------------------
@@ -265,7 +265,6 @@ public class DataPathDriver {
         pc = "0000000000000000";
         this.HALT.data = 0;
         this.stageIndicator = 0;
-//        getMainMemory().resizeMemory(getMainMemory().getMemSize());
         getRegisterFile().resizeMemory(getRegisterFile().getMemSize());
     }
 }

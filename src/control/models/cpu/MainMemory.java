@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainMemory {
-    final static int mainMemBits = 32;
+    private final static int mainMemBits = 32;
 
-    public Map<String, String> memoryMap = new HashMap<>();
+    private Map<String, String> memoryMap = new HashMap<>();
     private String address;
     private Signal memReadSignal;
     private Signal memWriteSignal;
@@ -40,24 +40,19 @@ public class MainMemory {
         }
     }
 
-    public void setup(String address, Signal memReadSignal, Signal memWriteSignal) {
+    void setup(String address, Signal memReadSignal, Signal memWriteSignal) {
         this.address = address;
         this.memReadSignal = memReadSignal;
         this.memWriteSignal = memWriteSignal;
     }
 
-    public void writeData(String data) {
+    void writeData(String data) {
         if (memWriteSignal.data == 1 && data.length() == 32) {
-//            memoryMap.replace(address, data);
-//            int tableIndex = Integer.parseInt(address, 2);
-//            MemTableCell cell = uiMemList.get(tableIndex);
-//            cell.setData(data);
-//            uiMemList.set(tableIndex, cell);
             putInMemory(address, data);
         }
     }
 
-    public String readData() {
+    String readData() {
         if (memReadSignal.data == 1)
             return memoryMap.get(address);
         else return "0";
@@ -70,12 +65,6 @@ public class MainMemory {
     }
 
     public void predefineData(long data, int numericalAddress) {
-//        String key = Utility.decimalToString(numericalAddress, mainMemBits);
-//        String value = Utility.decimalToString(data, 32);
-//        memoryMap.replace(key, value);
-//        MemTableCell cell = uiMemList.get(numericalAddress);
-//        cell.setData(value);
-//        uiMemList.set(numericalAddress, cell);
         putInMemory(numericalAddress, data);
 
     }
