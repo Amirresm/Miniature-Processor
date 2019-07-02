@@ -367,6 +367,7 @@ public class UiController {
             enableBanner(-1);
             isWorking = false;
         }
+
     }
 
     @FXML
