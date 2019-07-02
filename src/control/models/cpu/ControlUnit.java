@@ -51,13 +51,28 @@ public class ControlUnit {
                 REGDES.data = 1;
                 REGWRITE.data = 1;
                 break;
+            case "0110":        //slti
+                ALUOP.data = 3;
+                REGWRITE.data = 1;
+                ALUSRC.data = 1;
+                break;
             case "0011":        //or
                 ALUOP.data = 4;
                 REGDES.data = 1;
                 REGWRITE.data = 1;
                 break;
-            case "0100":        //and
+            case "0111":        //ori
+                ALUOP.data = 4;
+                REGWRITE.data = 1;
+                ALUSRC.data = 1;
+                break;
+            case "1100":        //and
                 ALUOP.data = 5;
+                REGDES.data = 1;
+                REGWRITE.data = 1;
+                break;
+            case "0100":        //nand
+                ALUOP.data = 6;
                 REGDES.data = 1;
                 REGWRITE.data = 1;
                 break;

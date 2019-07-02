@@ -22,6 +22,9 @@ public class ALU {
             case 5:
                 result = and(val1,val2);
                 break;
+            case 6:
+                result = nand(val1,val2);
+                break;
         }
         if(Long.parseLong(result,2) == 0)
             zeroSignal.data = 1;
@@ -46,6 +49,13 @@ public class ALU {
         long b1 = Long.parseLong(Reg1, 2);
         long b2 = Long.parseLong(Reg2, 2);
         long sum = b1 & b2;
+        return Utility.decimalToString(sum, 32);
+    }
+    public static String nand(String Reg1, String Reg2)
+    {
+        long b1 = Long.parseLong(Reg1, 2);
+        long b2 = Long.parseLong(Reg2, 2);
+        long sum = ~(b1 & b2);
         return Utility.decimalToString(sum, 32);
     }
     public static String or(String Reg1, String Reg2)
