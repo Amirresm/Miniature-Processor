@@ -1,6 +1,6 @@
 package control;
 
-import control.models.GuiDataHolder;
+import control.models.MapDataHolder;
 import control.models.MemTableCell;
 import control.models.cpu.*;
 import javafx.application.Platform;
@@ -8,11 +8,13 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.Glow;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 
@@ -25,6 +27,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class UiController {
+    final static float glowAmount = 0.6f;
     private int stageNumber = 0;
 
     private String codeString = "";
@@ -35,9 +38,42 @@ public class UiController {
 
     private DataPathDriver dataPathDriver;
 
-    private GuiDataHolder uiHolder;
+    private MapDataHolder uiHolder;
+
+    private int registerWatcher = 0;
+    private int memoryWatcher = 0;
 
     //================================================
+
+    @FXML
+    private  Label errorBanner;
+
+    @FXML
+    private  Label haltBanner;
+
+    @FXML
+    private Label regLoadLb;
+
+    @FXML
+    private Label memLoadLb;
+
+    @FXML
+    private Label regWatcherIdLb;
+
+    @FXML
+    private Label memWatcherIdLb;
+
+    @FXML
+    private Label regWatcherLb;
+
+    @FXML
+    private Label memWatcherLb;
+
+    @FXML
+    private ProgressBar regLoadPb;
+
+    @FXML
+    private ProgressBar memLoadPb;
 
     @FXML
     private TableColumn<String, MemTableCell> imBinCol;
@@ -289,7 +325,7 @@ public class UiController {
     @FXML
     public void initialize() {
         dataPathDriver = new DataPathDriver();
-        uiHolder = new GuiDataHolder();
+        uiHolder = new MapDataHolder();
         dataPathDriver.setUiHolder(uiHolder);
 
         InstructionMem instructionMem = new InstructionMem();
@@ -308,6 +344,31 @@ public class UiController {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 delayTf.setText((int) delaySlider.getValue() + "");
+            }
+        });
+
+        rfTableView.getFocusModel().focusedCellProperty().addListener(new ChangeListener<TablePosition>() {
+            @Override
+            public void changed(ObservableValue<? extends TablePosition> observable, TablePosition oldValue, TablePosition newValue) {
+                registerWatcher = newValue.getRow();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateWatchersUi();
+                    }
+                });
+            }
+        });
+        mmTableView.getFocusModel().focusedCellProperty().addListener(new ChangeListener<TablePosition>() {
+            @Override
+            public void changed(ObservableValue<? extends TablePosition> observable, TablePosition oldValue, TablePosition newValue) {
+                memoryWatcher = newValue.getRow();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateWatchersUi();
+                    }
+                });
             }
         });
     }
@@ -347,9 +408,7 @@ public class UiController {
             dataPathDriver.getUiHolder().reset();
         System.out.println("timer iterate: STAGE = " + stageNumber);
         System.out.println("PC = " + dataPathDriver.getPc());
-        if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
-//                    Platform.runLater(() -> {
-//                    });
+        if (dataPathDriver.getERROR().data == 0 &&(dataPathDriver.getHALT().data != 1 || stageNumber != 0)) {
             dataPathDriver.executeStage();
             Platform.runLater(() -> {
                 enableBanner(stageNumber);
@@ -360,10 +419,22 @@ public class UiController {
                     imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(), 2));
                 }
             });
+        } else if(dataPathDriver.getHALT().isOn()){
+            timer.cancel();
+            timer.purge();
+            Platform.runLater(() -> {
+                nextBt.setText("Run");
+                enableHaltBanner(true);
+            });
+            enableBanner(-1);
+            isWorking = false;
         } else {
             timer.cancel();
             timer.purge();
-            Platform.runLater(() -> {nextBt.setText("Run");});
+            Platform.runLater(() -> {
+                nextBt.setText("Run");
+                enableErrorBanner(true);
+            });
             enableBanner(-1);
             isWorking = false;
         }
@@ -375,6 +446,8 @@ public class UiController {
         dataPathDriver.resetDriver();
         dataPathDriver.getUiHolder().reset();
         enableBanner(-1);
+        enableHaltBanner(false);
+        enableErrorBanner(false);
         updateGuiMap();
     }
 
@@ -388,6 +461,7 @@ public class UiController {
             int memSize = Integer.parseInt(memSizeTf.getText());
             dataPathDriver.getMainMemory().resizeMemory(memSize);
         }
+        updateStatsUi();
     }
 
     @FXML
@@ -395,6 +469,7 @@ public class UiController {
         if ((changeValTf.getText().trim().length() > 0) && (changeAddrTf.getText().trim().length() > 0)) {
             dataPathDriver.getMainMemory().predefineData(Long.parseLong(changeValTf.getText()), Integer.parseInt(changeAddrTf.getText()));
             mmTableView.refresh();
+            updateStatsUi();
         }
         System.out.println("data:");
         for (MemTableCell cell : rfList) {
@@ -407,7 +482,7 @@ public class UiController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open project");
         File file = fileChooser.showOpenDialog(loadBt.getScene().getWindow());
-        if(file != null) {
+        if (file != null) {
             List<String> instructions = new ArrayList<>();
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
@@ -440,19 +515,49 @@ public class UiController {
         }
     }
 
+    private void enableErrorBanner(boolean enable) {
+        if(enable) {
+            errorBanner.getStyleClass().remove("error-banner-deactive");
+            errorBanner.getStyleClass().add("error-banner-active");
+            errorBanner.setEffect(new Glow(glowAmount));
+        }
+        else {
+            errorBanner.getStyleClass().remove("error-banner-active");
+            errorBanner.getStyleClass().add("error-banner-deactive");
+            errorBanner.setEffect(new Glow(0));
+        }
+    }
+
+    private void enableHaltBanner(boolean enable) {
+        if(enable) {
+            haltBanner.getStyleClass().remove("halt-banner-deactive");
+            haltBanner.getStyleClass().add("halt-banner-active");
+            haltBanner.setEffect(new Glow(glowAmount));
+        }
+        else {
+            haltBanner.getStyleClass().remove("halt-banner-active");
+            haltBanner.getStyleClass().add("halt-banner-deactive");
+            haltBanner.setEffect(new Glow(0));
+        }
+    }
 
     private void enableBanner(int id) {
         System.out.println("banner number " + (id + 1));
         fetchBanner.getStyleClass().remove("banner-active");
         fetchBanner.getStyleClass().add("banner-deactive");
+        fetchBanner.setEffect(new Glow(0));
         decodeBanner.getStyleClass().remove("banner-active");
         decodeBanner.getStyleClass().add("banner-deactive");
+        decodeBanner.setEffect(new Glow(0));
         exeBanner.getStyleClass().remove("banner-active");
         exeBanner.getStyleClass().add("banner-deactive");
+        exeBanner.setEffect(new Glow(0));
         memBanner.getStyleClass().remove("banner-active");
         memBanner.getStyleClass().add("banner-deactive");
+        memBanner.setEffect(new Glow(0));
         wbBanner.getStyleClass().remove("banner-active");
         wbBanner.getStyleClass().add("banner-deactive");
+        wbBanner.setEffect(new Glow(0));
 
         switch (id) {
             case -1:
@@ -460,22 +565,27 @@ public class UiController {
             case 0:
                 fetchBanner.getStyleClass().remove("banner-deactive");
                 fetchBanner.getStyleClass().add("banner-active");
+                fetchBanner.setEffect(new Glow(glowAmount));
                 break;
             case 1:
                 decodeBanner.getStyleClass().remove("banner-deactive");
                 decodeBanner.getStyleClass().add("banner-active");
+                decodeBanner.setEffect(new Glow(glowAmount));
                 break;
             case 2:
                 exeBanner.getStyleClass().remove("banner-deactive");
                 exeBanner.getStyleClass().add("banner-active");
+                exeBanner.setEffect(new Glow(glowAmount));
                 break;
             case 3:
                 memBanner.getStyleClass().remove("banner-deactive");
                 memBanner.getStyleClass().add("banner-active");
+                memBanner.setEffect(new Glow(glowAmount));
                 break;
             case 4:
                 wbBanner.getStyleClass().remove("banner-deactive");
                 wbBanner.getStyleClass().add("banner-active");
+                wbBanner.setEffect(new Glow(glowAmount));
                 break;
         }
     }
@@ -523,6 +633,34 @@ public class UiController {
         setEnabled(iRegWrite, "circle", uiHolder.regWrite);
         setEnabled(iZero, "circle", uiHolder.aluZero);
         setEnabled(iBranchAndZero, "circle", uiHolder.branchANDZero);
+
+        updateWatchersUi();
+
+        updateStatsUi();
+    }
+
+    private void updateStatsUi() {
+        double regPercent = (double) dataPathDriver.getRegisterFile().used.size() / (double) dataPathDriver.getRegisterFile().getMemSize();
+        double memPercent = (double) dataPathDriver.getMainMemory().used.size() / (double) dataPathDriver.getMainMemory().getMemSize();
+        regLoadPb.setProgress(regPercent);
+        memLoadPb.setProgress(memPercent);
+        regLoadLb.setText(regPercent * 100 + "%");
+        memLoadLb.setText(memPercent * 100 + "%");
+    }
+
+    private void updateWatchersUi() {
+        String regLbText = Long.parseLong(dataPathDriver.getRegisterFile().readGuiTool(registerWatcher), 2) + "";
+        String memLbText = Long.parseLong(dataPathDriver.getMainMemory().readGuiTool(memoryWatcher), 2) + "";
+
+        regWatcherIdLb.setText(stageNumber + "");
+        regWatcherIdLb.setText("$Register " + registerWatcher);
+        memWatcherIdLb.setText(stageNumber + "");
+        memWatcherIdLb.setText("#Memory " + memoryWatcher);
+
+        regWatcherLb.setText(stageNumber + "");
+        regWatcherLb.setText(regLbText);
+        memWatcherLb.setText(stageNumber + "");
+        memWatcherLb.setText(memLbText);
     }
 
     private void setEnabled(Node node, String type, boolean enable) {

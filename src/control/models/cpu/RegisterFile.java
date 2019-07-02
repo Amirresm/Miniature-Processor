@@ -4,10 +4,14 @@ import control.models.MemTableCell;
 import javafx.collections.ObservableList;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class RegisterFile {
     private Map<String, String> registerMemory = new HashMap<>();
+
+    public Set<Integer> used = new HashSet<>();
 
     private String readAddr1;
     private String readAddr2;
@@ -40,6 +44,7 @@ public class RegisterFile {
             cell.setDecData(0);
             uiMemList.add(cell);
         }
+        used.clear();
     }
 
     void setup(String readAddr1, String readAddr2, String writeAddr, Signal flag) {
@@ -57,13 +62,17 @@ public class RegisterFile {
         return registerMemory.get(readAddr2);
     }
 
+    public String readGuiTool(long addr) {
+        return registerMemory.get(Utility.decimalToString(addr, 4));
+    }
+
     void write(String registerWriteData) {
         if (regWrite && registerWriteData.length() == 32) {
             putInMemory(writeAddr, registerWriteData);
         }
     }
 
-    int getMemSize() {
+    public int getMemSize() {
         return memSize;
     }
 
@@ -77,5 +86,7 @@ public class RegisterFile {
         cell.setData(registerWriteData);
         cell.setDecData((int)Long.parseLong(registerWriteData, 2));
         uiMemList.set(tableIndex, cell);
+        used.add(tableIndex);
     }
+
 }

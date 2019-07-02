@@ -1,6 +1,6 @@
 package control.models.cpu;
 
-import control.models.GuiDataHolder;
+import control.models.MapDataHolder;
 
 public class DataPathDriver {
     private InstructionMem instructionMem;
@@ -9,11 +9,12 @@ public class DataPathDriver {
     private MainMemory mainMemory;
     private ALU alu;
 
-    private GuiDataHolder uiHolder;
+    private MapDataHolder uiHolder;
     private int stageIndicator = 0;
 
     //halt signal
     private Signal HALT = new Signal(0);
+    private Signal ERROR = new Signal(0);
 
     private String pc;
     private String nextPc;
@@ -78,6 +79,8 @@ public class DataPathDriver {
 
     private void stageIF() {
         instruction = instructionMem.getInstruction(pc);
+        if (instruction == null || instruction.length() != 32)
+            ERROR.data = 1;//pc error
         nextPc = Adder.compute(pc, "00000000000000000000000000000001"); //pc + 1
 
         //gui
@@ -100,8 +103,11 @@ public class DataPathDriver {
         //setup control unit
         controlUnit.setup(oppCode);
 
-        if(controlUnit.HALT.data == 1)
+        if (controlUnit.HALT.data == 1)
             HALT.data = 1;
+
+        if (controlUnit.machineError.data == 1)
+            ERROR.data = 2;//oppcode error
 
         //setup register file
         String writeRegisterMux = Mux.compute(regAddr2, regWAddr, controlUnit.REGDES);
@@ -135,8 +141,7 @@ public class DataPathDriver {
         uiHolder.memRead = controlUnit.MEMREAD.isOn();
         uiHolder.aluSrc = controlUnit.ALUSRC.isOn();
         uiHolder.regWrite = controlUnit.REGWRITE.isOn();
-        switch (controlUnit.ALUOP.data)
-        {
+        switch (controlUnit.ALUOP.data) {
             case 1:
                 uiHolder.aluOp = "add";
                 break;
@@ -195,6 +200,7 @@ public class DataPathDriver {
 
         //GUI----------------------------------------------
         uiHolder.setWriteData(registerWriteData);
+        //statistics
     }
 
     public InstructionMem getInstructionMem() {
@@ -241,6 +247,10 @@ public class DataPathDriver {
         return HALT;
     }
 
+    public Signal getERROR() {
+        return ERROR;
+    }
+
     public String getPc() {
         return pc;
     }
@@ -253,17 +263,18 @@ public class DataPathDriver {
         return stageIndicator;
     }
 
-    public GuiDataHolder getUiHolder() {
+    public MapDataHolder getUiHolder() {
         return uiHolder;
     }
 
-    public void setUiHolder(GuiDataHolder uiHolder) {
+    public void setUiHolder(MapDataHolder uiHolder) {
         this.uiHolder = uiHolder;
     }
 
     public void resetDriver() {
         pc = "0000000000000000";
         this.HALT.data = 0;
+        this.ERROR.data = 0;
         this.stageIndicator = 0;
         getRegisterFile().resizeMemory(getRegisterFile().getMemSize());
 
