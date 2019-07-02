@@ -363,7 +363,7 @@ public class UiController {
         } else {
             timer.cancel();
             timer.purge();
-            nextBt.setText("Run");
+            Platform.runLater(() -> {nextBt.setText("Run");});
             enableBanner(-1);
             isWorking = false;
         }
