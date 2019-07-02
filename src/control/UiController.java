@@ -363,10 +363,11 @@ public class UiController {
         } else {
             timer.cancel();
             timer.purge();
-            nextBt.setText("Run");
+            Platform.runLater(() -> {nextBt.setText("Run");});
             enableBanner(-1);
             isWorking = false;
         }
+
     }
 
     @FXML
@@ -406,7 +407,7 @@ public class UiController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open project");
         File file = fileChooser.showOpenDialog(loadBt.getScene().getWindow());
-        if (file != null) {
+        if(file != null) {
             List<String> instructions = new ArrayList<>();
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
@@ -529,25 +530,39 @@ public class UiController {
         String disableStyle = "";
         switch (type) {
             case "signal":
-                enableStyle = "signal-enabled";
-                disableStyle = "signal-disabled";
+                enableStyle = "    -fx-background-color: rgb(255, 96, 0);\n" +
+                        "    -fx-background-radius: 5px;\n" +
+                        "    -fx-background-insets: 1px;\n" +
+                        "    -fx-text-fill: #8e3e00;\n" +
+                        "    -fx-font-size: 9px;\n" +
+                        "    -fx-border-radius: 5px;\n" +
+                        "    -fx-border-insets: 1px;";
+                disableStyle = "    -fx-background-color: #927865;\n" +
+                        "    -fx-background-radius: 3px;\n" +
+                        "    -fx-background-insets: 1px;\n" +
+                        "    -fx-text-fill: #49382a;\n" +
+                        "    -fx-font-size: 9px;\n" +
+                        "    -fx-font-weight: normal;\n" +
+                        "    -fx-border-color: transparent;";
                 break;
             case "circle":
-                enableStyle = "circle-signal-enabled";
-                disableStyle = "circle-signal-disabled";
+                enableStyle = "    -fx-fill: #e53607;\n" +
+                        "    -fx-stroke: #2C0303;";
+                disableStyle = "    -fx-fill: #66544e;\n" +
+                        "    -fx-stroke: transparent;";
                 break;
         }
         if (enable) {
-            if (node.getStyleClass().indexOf(disableStyle) >= 0)
-                node.getStyleClass().remove(node.getStyleClass().indexOf(disableStyle));
-            node.getStyleClass().add(enableStyle);
+//            node.getStyleClass().remove(disableStyle);
+//            node.getStyleClass().add(enableStyle);
+            node.setStyle(enableStyle);
             if (type.equals("circle")) {
                 ((Circle) node).setRadius(5);
             }
         } else {
-            if (node.getStyleClass().indexOf(enableStyle) >= 0)
-                node.getStyleClass().remove(node.getStyleClass().indexOf(enableStyle));
-            node.getStyleClass().add(disableStyle);
+            node.setStyle(disableStyle);
+//            node.getStyleClass().remove(enableStyle);
+//            node.getStyleClass().add(disableStyle);
             if (type.equals("circle")) {
                 ((Circle) node).setRadius(3);
             }
