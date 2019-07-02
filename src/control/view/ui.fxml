@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
@@ -253,35 +254,10 @@
             </ScrollPane>
             <AnchorPane minWidth="100.0">
                <children>
-                  <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox layoutX="-4.0" layoutY="14.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                      <children>
-                        <HBox alignment="CENTER_LEFT">
-                           <children>
-                              <TextField fx:id="delayTf" promptText="delay" HBox.hgrow="ALWAYS" />
-                              <Button fx:id="nextBt" mnemonicParsing="false" onAction="#nextBtAction" text="Run" />
-                           </children>
-                        </HBox>
-                        <Slider fx:id="delaySlider" majorTickUnit="500.0" max="2050.0" min="50.0" minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
-                        <Button mnemonicParsing="false" onAction="#resetAction" text="Reset" />
-                        <VBox alignment="CENTER">
-                           <children>
-                              <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
-                                 <children>
-                                    <TextField fx:id="regSizeTf" promptText="Reg size" HBox.hgrow="ALWAYS" />
-                                    <TextField fx:id="memSizeTf" promptText="Memory size" />
-                                    <Button fx:id="setBt" ellipsisString="Set" mnemonicParsing="false" onAction="#setMemAction" text="Set Memories" />
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                        <Button fx:id="loadBt" mnemonicParsing="false" onAction="#loadButtonAction" text="Load machine code" />
-                        <HBox alignment="CENTER">
-                           <children>
-                              <TextField fx:id="changeValTf" promptText="Value" HBox.hgrow="ALWAYS" />
-                              <TextField fx:id="changeAddrTf" promptText="Address" />
-                              <Button fx:id="updateMemBt" ellipsisString="Update" mnemonicParsing="false" onAction="#updateMemAction" text="Update memory" />
-                           </children>
-                        </HBox>
+                        <ProgressBar fx:id="regLoadPb" prefWidth="200.0" progress="0.0" />
+                        <ProgressBar fx:id="memLoadPb" prefWidth="200.0" progress="0.0" />
                      </children>
                   </VBox>
                </children>
@@ -375,7 +351,40 @@
                               </AnchorPane>
                           </items>
                         </SplitPane>
-                        <AnchorPane minWidth="100.0" />
+                        <AnchorPane minWidth="100.0">
+                           <children>
+                              <VBox alignment="TOP_CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <HBox alignment="CENTER_LEFT">
+                                       <children>
+                                          <TextField fx:id="delayTf" promptText="delay" HBox.hgrow="ALWAYS" />
+                                          <Button fx:id="nextBt" mnemonicParsing="false" onAction="#nextBtAction" text="Run" />
+                                       </children>
+                                    </HBox>
+                                    <Slider fx:id="delaySlider" majorTickUnit="500.0" max="2050.0" min="50.0" minorTickCount="2" showTickLabels="true" showTickMarks="true" snapToTicks="true" />
+                                    <Button mnemonicParsing="false" onAction="#resetAction" text="Reset" />
+                                    <VBox alignment="CENTER">
+                                       <children>
+                                          <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+                                             <children>
+                                                <TextField fx:id="regSizeTf" promptText="Reg size" HBox.hgrow="ALWAYS" />
+                                                <TextField fx:id="memSizeTf" promptText="Memory size" />
+                                                <Button fx:id="setBt" ellipsisString="Set" mnemonicParsing="false" onAction="#setMemAction" text="Set Memories" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <Button fx:id="loadBt" mnemonicParsing="false" onAction="#loadButtonAction" text="Load machine code" />
+                                    <HBox alignment="CENTER">
+                                       <children>
+                                          <TextField fx:id="changeValTf" promptText="Value" HBox.hgrow="ALWAYS" />
+                                          <TextField fx:id="changeAddrTf" promptText="Address" />
+                                          <Button fx:id="updateMemBt" ellipsisString="Update" mnemonicParsing="false" onAction="#updateMemAction" text="Update memory" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children></AnchorPane>
                      </items>
                   </SplitPane>
                </children>

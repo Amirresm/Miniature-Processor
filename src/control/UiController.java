@@ -1,6 +1,6 @@
 package control;
 
-import control.models.GuiDataHolder;
+import control.models.MapDataHolder;
 import control.models.MemTableCell;
 import control.models.cpu.*;
 import javafx.application.Platform;
@@ -35,9 +35,15 @@ public class UiController {
 
     private DataPathDriver dataPathDriver;
 
-    private GuiDataHolder uiHolder;
+    private MapDataHolder uiHolder;
 
     //================================================
+
+    @FXML
+    private ProgressBar regLoadPb;
+
+    @FXML
+    private ProgressBar memLoadPb;
 
     @FXML
     private TableColumn<String, MemTableCell> imBinCol;
@@ -289,7 +295,7 @@ public class UiController {
     @FXML
     public void initialize() {
         dataPathDriver = new DataPathDriver();
-        uiHolder = new GuiDataHolder();
+        uiHolder = new MapDataHolder();
         dataPathDriver.setUiHolder(uiHolder);
 
         InstructionMem instructionMem = new InstructionMem();
@@ -388,6 +394,7 @@ public class UiController {
             int memSize = Integer.parseInt(memSizeTf.getText());
             dataPathDriver.getMainMemory().resizeMemory(memSize);
         }
+        updateStatsUi();
     }
 
     @FXML
@@ -395,6 +402,7 @@ public class UiController {
         if ((changeValTf.getText().trim().length() > 0) && (changeAddrTf.getText().trim().length() > 0)) {
             dataPathDriver.getMainMemory().predefineData(Long.parseLong(changeValTf.getText()), Integer.parseInt(changeAddrTf.getText()));
             mmTableView.refresh();
+            updateStatsUi();
         }
         System.out.println("data:");
         for (MemTableCell cell : rfList) {
@@ -523,6 +531,13 @@ public class UiController {
         setEnabled(iRegWrite, "circle", uiHolder.regWrite);
         setEnabled(iZero, "circle", uiHolder.aluZero);
         setEnabled(iBranchAndZero, "circle", uiHolder.branchANDZero);
+
+        updateStatsUi();
+    }
+
+    private void updateStatsUi() {
+        regLoadPb.setProgress((double)dataPathDriver.getRegisterFile().used.size() / (double)dataPathDriver.getRegisterFile().getMemSize());
+        memLoadPb.setProgress((double)dataPathDriver.getMainMemory().used.size()  / (double)dataPathDriver.getMainMemory().getMemSize());
     }
 
     private void setEnabled(Node node, String type, boolean enable) {

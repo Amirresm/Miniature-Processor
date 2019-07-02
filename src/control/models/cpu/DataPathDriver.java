@@ -1,6 +1,6 @@
 package control.models.cpu;
 
-import control.models.GuiDataHolder;
+import control.models.MapDataHolder;
 
 public class DataPathDriver {
     private InstructionMem instructionMem;
@@ -9,7 +9,7 @@ public class DataPathDriver {
     private MainMemory mainMemory;
     private ALU alu;
 
-    private GuiDataHolder uiHolder;
+    private MapDataHolder uiHolder;
     private int stageIndicator = 0;
 
     //halt signal
@@ -195,6 +195,7 @@ public class DataPathDriver {
 
         //GUI----------------------------------------------
         uiHolder.setWriteData(registerWriteData);
+        //statistics
     }
 
     public InstructionMem getInstructionMem() {
@@ -253,11 +254,11 @@ public class DataPathDriver {
         return stageIndicator;
     }
 
-    public GuiDataHolder getUiHolder() {
+    public MapDataHolder getUiHolder() {
         return uiHolder;
     }
 
-    public void setUiHolder(GuiDataHolder uiHolder) {
+    public void setUiHolder(MapDataHolder uiHolder) {
         this.uiHolder = uiHolder;
     }
 

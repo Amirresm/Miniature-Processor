@@ -4,10 +4,14 @@ import control.models.MemTableCell;
 import javafx.collections.ObservableList;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MainMemory {
     private final static int mainMemBits = 32;
+
+    public Set<Integer> used = new HashSet<>();
 
     private Map<String, String> memoryMap = new HashMap<>();
     private String address;
@@ -38,6 +42,7 @@ public class MainMemory {
             cell.setDecData(0);
             uiMemList.add(cell);
         }
+        used.clear();
     }
 
     void setup(String address, Signal memReadSignal, Signal memWriteSignal) {
@@ -58,15 +63,14 @@ public class MainMemory {
         else return "0";
     }
 
-    public void predefineData(String data, int numericalAddress) {
-        String key = Utility.decimalToString(numericalAddress, mainMemBits);
-        memoryMap.replace(key, data);
-        uiMemList.get(numericalAddress).setData(data);
-    }
+//    public void predefineData(String data, int numericalAddress) {
+//        String key = Utility.decimalToString(numericalAddress, mainMemBits);
+//        memoryMap.replace(key, data);
+//        uiMemList.get(numericalAddress).setData(data);
+//    }
 
     public void predefineData(long data, int numericalAddress) {
         putInMemory(numericalAddress, data);
-
     }
 
     public int getMemSize() {
@@ -83,6 +87,7 @@ public class MainMemory {
         cell.setData(registerWriteData);
         cell.setDecData(Integer.parseInt(registerWriteData, 2));
         uiMemList.set(tableIndex, cell);
+        used.add(tableIndex);
     }
 
     private void putInMemory(int addr, long registerWriteData) {
@@ -96,5 +101,6 @@ public class MainMemory {
         cell.setData(value);
         cell.setDecData((int)registerWriteData);
         uiMemList.set(addr, cell);
+        used.add(addr);
     }
 }

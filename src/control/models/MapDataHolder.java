@@ -1,8 +1,8 @@
 package control.models;
 
-import control.models.cpu.Signal;
+public class MapDataHolder {
+    public StatsHolder statsHolder = new StatsHolder();
 
-public class GuiDataHolder {
     public String pc;
     public String pcPOne;
     public String instruction;
@@ -37,97 +37,97 @@ public class GuiDataHolder {
 
     public String aluOp;
 
-    public GuiDataHolder setPc(String pc) {
+    public MapDataHolder setPc(String pc) {
         this.pc = Long.parseLong(pc, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setPcPOne(String pcPOne) {
+    public MapDataHolder setPcPOne(String pcPOne) {
         this.pcPOne = String.valueOf(Long.parseLong(pcPOne, 2));
         return this;
     }
 
-    public GuiDataHolder setInstruction(String instruction) {
+    public MapDataHolder setInstruction(String instruction) {
         this.instruction = Long.parseLong(instruction, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setJump(String jump) {
+    public MapDataHolder setJump(String jump) {
         this.jump = Long.parseLong(jump, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setOppCode(String oppCode) {
+    public MapDataHolder setOppCode(String oppCode) {
         this.oppCode = Long.parseLong(oppCode, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setRs(String rs) {
+    public MapDataHolder setRs(String rs) {
         this.rs = Long.parseLong(rs, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setRt(String rt) {
+    public MapDataHolder setRt(String rt) {
         this.rt = Long.parseLong(rt, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setRd(String rd) {
+    public MapDataHolder setRd(String rd) {
         this.rd = Long.parseLong(rd, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setOffset(String offset) {
+    public MapDataHolder setOffset(String offset) {
         this.offset = Long.parseLong(offset, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setRegRead1(String regRead1) {
+    public MapDataHolder setRegRead1(String regRead1) {
         this.regRead1 = Long.parseLong(regRead1, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setRegRead2(String regRead2) {
+    public MapDataHolder setRegRead2(String regRead2) {
         this.regRead2 = Long.parseLong(regRead2, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setWriteReg(String writeReg) {
+    public MapDataHolder setWriteReg(String writeReg) {
         this.writeReg = Long.parseLong(writeReg, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setReadData1(String readData1) {
+    public MapDataHolder setReadData1(String readData1) {
         this.readData1 = Long.parseLong(readData1, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setReadData2(String readData2) {
+    public MapDataHolder setReadData2(String readData2) {
         this.readData2 = Long.parseLong(readData2, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setAluResult(String aluResult) {
+    public MapDataHolder setAluResult(String aluResult) {
         this.aluResult = Long.parseLong(aluResult, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setBranchPc(String branchPc) {
+    public MapDataHolder setBranchPc(String branchPc) {
         this.branchPc = Long.parseLong(branchPc, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setNextPc(String nextPc) {
+    public MapDataHolder setNextPc(String nextPc) {
         this.nextPc = Long.parseLong(nextPc, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setMemoryWrite(String memoryWrite) {
+    public MapDataHolder setMemoryWrite(String memoryWrite) {
         this.memoryWrite = Long.parseLong(memoryWrite, 2)+"";
         return this;
     }
 
-    public GuiDataHolder setMemory(String memory) {
+    public MapDataHolder setMemory(String memory) {
         if(memory == "0")
             this.memory = "0";
         else
@@ -135,7 +135,7 @@ public class GuiDataHolder {
         return this;
     }
 
-    public GuiDataHolder setWriteData(String writeData) {
+    public MapDataHolder setWriteData(String writeData) {
         this.writeData = Long.parseLong(writeData, 2)+"";
         return this;
     }
