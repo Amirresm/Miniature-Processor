@@ -63,6 +63,10 @@ public class MainMemory {
         else return "0";
     }
 
+    public String readGuiTool(long addr) {
+        return memoryMap.get(Utility.decimalToString(addr, 32));
+    }
+
 //    public void predefineData(String data, int numericalAddress) {
 //        String key = Utility.decimalToString(numericalAddress, mainMemBits);
 //        memoryMap.replace(key, data);

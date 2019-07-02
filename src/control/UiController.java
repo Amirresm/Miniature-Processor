@@ -8,6 +8,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -37,7 +38,34 @@ public class UiController {
 
     private MapDataHolder uiHolder;
 
+    private int registerWatcher = 0;
+    private int memoryWatcher = 0;
+
     //================================================
+
+    @FXML
+    private  Label errorBanner;
+
+    @FXML
+    private  Label haltBanner;
+
+    @FXML
+    private Label regLoadLb;
+
+    @FXML
+    private Label memLoadLb;
+
+    @FXML
+    private Label regWatcherIdLb;
+
+    @FXML
+    private Label memWatcherIdLb;
+
+    @FXML
+    private Label regWatcherLb;
+
+    @FXML
+    private Label memWatcherLb;
 
     @FXML
     private ProgressBar regLoadPb;
@@ -316,6 +344,31 @@ public class UiController {
                 delayTf.setText((int) delaySlider.getValue() + "");
             }
         });
+
+        rfTableView.getFocusModel().focusedCellProperty().addListener(new ChangeListener<TablePosition>() {
+            @Override
+            public void changed(ObservableValue<? extends TablePosition> observable, TablePosition oldValue, TablePosition newValue) {
+                registerWatcher = newValue.getRow();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateWatchersUi();
+                    }
+                });
+            }
+        });
+        mmTableView.getFocusModel().focusedCellProperty().addListener(new ChangeListener<TablePosition>() {
+            @Override
+            public void changed(ObservableValue<? extends TablePosition> observable, TablePosition oldValue, TablePosition newValue) {
+                memoryWatcher = newValue.getRow();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateWatchersUi();
+                    }
+                });
+            }
+        });
     }
 
     @FXML
@@ -354,8 +407,6 @@ public class UiController {
         System.out.println("timer iterate: STAGE = " + stageNumber);
         System.out.println("PC = " + dataPathDriver.getPc());
         if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
-//                    Platform.runLater(() -> {
-//                    });
             dataPathDriver.executeStage();
             Platform.runLater(() -> {
                 enableBanner(stageNumber);
@@ -369,7 +420,9 @@ public class UiController {
         } else {
             timer.cancel();
             timer.purge();
-            Platform.runLater(() -> {nextBt.setText("Run");});
+            Platform.runLater(() -> {
+                nextBt.setText("Run");
+            });
             enableBanner(-1);
             isWorking = false;
         }
@@ -415,7 +468,7 @@ public class UiController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open project");
         File file = fileChooser.showOpenDialog(loadBt.getScene().getWindow());
-        if(file != null) {
+        if (file != null) {
             List<String> instructions = new ArrayList<>();
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
@@ -532,12 +585,33 @@ public class UiController {
         setEnabled(iZero, "circle", uiHolder.aluZero);
         setEnabled(iBranchAndZero, "circle", uiHolder.branchANDZero);
 
+        updateWatchersUi();
+
         updateStatsUi();
     }
 
     private void updateStatsUi() {
-        regLoadPb.setProgress((double)dataPathDriver.getRegisterFile().used.size() / (double)dataPathDriver.getRegisterFile().getMemSize());
-        memLoadPb.setProgress((double)dataPathDriver.getMainMemory().used.size()  / (double)dataPathDriver.getMainMemory().getMemSize());
+        double regPercent = (double) dataPathDriver.getRegisterFile().used.size() / (double) dataPathDriver.getRegisterFile().getMemSize();
+        double memPercent = (double) dataPathDriver.getMainMemory().used.size() / (double) dataPathDriver.getMainMemory().getMemSize();
+        regLoadPb.setProgress(regPercent);
+        memLoadPb.setProgress(memPercent);
+        regLoadLb.setText(regPercent * 100 + "%");
+        memLoadLb.setText(memPercent * 100 + "%");
+    }
+
+    private void updateWatchersUi() {
+        String regLbText = Long.parseLong(dataPathDriver.getRegisterFile().readGuiTool(registerWatcher), 2) + "";
+        String memLbText = Long.parseLong(dataPathDriver.getMainMemory().readGuiTool(memoryWatcher), 2) + "";
+
+        regWatcherIdLb.setText(stageNumber + "");
+        regWatcherIdLb.setText("$Register " + registerWatcher);
+        memWatcherIdLb.setText(stageNumber + "");
+        memWatcherIdLb.setText("#Memory " + memoryWatcher);
+
+        regWatcherLb.setText(stageNumber + "");
+        regWatcherLb.setText(regLbText);
+        memWatcherLb.setText(stageNumber + "");
+        memWatcherLb.setText(memLbText);
     }
 
     private void setEnabled(Node node, String type, boolean enable) {

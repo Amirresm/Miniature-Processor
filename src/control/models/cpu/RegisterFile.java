@@ -62,6 +62,10 @@ public class RegisterFile {
         return registerMemory.get(readAddr2);
     }
 
+    public String readGuiTool(long addr) {
+        return registerMemory.get(Utility.decimalToString(addr, 4));
+    }
+
     void write(String registerWriteData) {
         if (regWrite && registerWriteData.length() == 32) {
             putInMemory(writeAddr, registerWriteData);
