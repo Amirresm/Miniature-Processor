@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.effect.Glow;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 
@@ -26,6 +27,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class UiController {
+    final static float glowAmount = 0.6f;
     private int stageNumber = 0;
 
     private String codeString = "";
@@ -406,7 +408,7 @@ public class UiController {
             dataPathDriver.getUiHolder().reset();
         System.out.println("timer iterate: STAGE = " + stageNumber);
         System.out.println("PC = " + dataPathDriver.getPc());
-        if (dataPathDriver.getHALT().data != 1 || stageNumber != 0) {
+        if (dataPathDriver.getERROR().data == 0 &&(dataPathDriver.getHALT().data != 1 || stageNumber != 0)) {
             dataPathDriver.executeStage();
             Platform.runLater(() -> {
                 enableBanner(stageNumber);
@@ -417,11 +419,21 @@ public class UiController {
                     imTableView.getSelectionModel().select(Integer.parseInt(dataPathDriver.getPc(), 2));
                 }
             });
+        } else if(dataPathDriver.getHALT().isOn()){
+            timer.cancel();
+            timer.purge();
+            Platform.runLater(() -> {
+                nextBt.setText("Run");
+                enableHaltBanner(true);
+            });
+            enableBanner(-1);
+            isWorking = false;
         } else {
             timer.cancel();
             timer.purge();
             Platform.runLater(() -> {
                 nextBt.setText("Run");
+                enableErrorBanner(true);
             });
             enableBanner(-1);
             isWorking = false;
@@ -434,6 +446,8 @@ public class UiController {
         dataPathDriver.resetDriver();
         dataPathDriver.getUiHolder().reset();
         enableBanner(-1);
+        enableHaltBanner(false);
+        enableErrorBanner(false);
         updateGuiMap();
     }
 
@@ -501,19 +515,49 @@ public class UiController {
         }
     }
 
+    private void enableErrorBanner(boolean enable) {
+        if(enable) {
+            errorBanner.getStyleClass().remove("error-banner-deactive");
+            errorBanner.getStyleClass().add("error-banner-active");
+            errorBanner.setEffect(new Glow(glowAmount));
+        }
+        else {
+            errorBanner.getStyleClass().remove("error-banner-active");
+            errorBanner.getStyleClass().add("error-banner-deactive");
+            errorBanner.setEffect(new Glow(0));
+        }
+    }
+
+    private void enableHaltBanner(boolean enable) {
+        if(enable) {
+            haltBanner.getStyleClass().remove("halt-banner-deactive");
+            haltBanner.getStyleClass().add("halt-banner-active");
+            haltBanner.setEffect(new Glow(glowAmount));
+        }
+        else {
+            haltBanner.getStyleClass().remove("halt-banner-active");
+            haltBanner.getStyleClass().add("halt-banner-deactive");
+            haltBanner.setEffect(new Glow(0));
+        }
+    }
 
     private void enableBanner(int id) {
         System.out.println("banner number " + (id + 1));
         fetchBanner.getStyleClass().remove("banner-active");
         fetchBanner.getStyleClass().add("banner-deactive");
+        fetchBanner.setEffect(new Glow(0));
         decodeBanner.getStyleClass().remove("banner-active");
         decodeBanner.getStyleClass().add("banner-deactive");
+        decodeBanner.setEffect(new Glow(0));
         exeBanner.getStyleClass().remove("banner-active");
         exeBanner.getStyleClass().add("banner-deactive");
+        exeBanner.setEffect(new Glow(0));
         memBanner.getStyleClass().remove("banner-active");
         memBanner.getStyleClass().add("banner-deactive");
+        memBanner.setEffect(new Glow(0));
         wbBanner.getStyleClass().remove("banner-active");
         wbBanner.getStyleClass().add("banner-deactive");
+        wbBanner.setEffect(new Glow(0));
 
         switch (id) {
             case -1:
@@ -521,22 +565,27 @@ public class UiController {
             case 0:
                 fetchBanner.getStyleClass().remove("banner-deactive");
                 fetchBanner.getStyleClass().add("banner-active");
+                fetchBanner.setEffect(new Glow(glowAmount));
                 break;
             case 1:
                 decodeBanner.getStyleClass().remove("banner-deactive");
                 decodeBanner.getStyleClass().add("banner-active");
+                decodeBanner.setEffect(new Glow(glowAmount));
                 break;
             case 2:
                 exeBanner.getStyleClass().remove("banner-deactive");
                 exeBanner.getStyleClass().add("banner-active");
+                exeBanner.setEffect(new Glow(glowAmount));
                 break;
             case 3:
                 memBanner.getStyleClass().remove("banner-deactive");
                 memBanner.getStyleClass().add("banner-active");
+                memBanner.setEffect(new Glow(glowAmount));
                 break;
             case 4:
                 wbBanner.getStyleClass().remove("banner-deactive");
                 wbBanner.getStyleClass().add("banner-active");
+                wbBanner.setEffect(new Glow(glowAmount));
                 break;
         }
     }
