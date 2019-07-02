@@ -19,17 +19,17 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<SplitPane dividerPositions="0.6102756892230576" orientation="VERTICAL" prefHeight="500.0" prefWidth="1100.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.UiController">
+<SplitPane dividerPositions="0.7" orientation="VERTICAL" prefHeight="800.0" prefWidth="1300.0" stylesheets="@style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="control.UiController">
    <items>
       <SplitPane dividerPositions="0.85">
          <items>
-            <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" prefWidth="1100.0">
+            <ScrollPane fitToHeight="true" fitToWidth="true" pannable="true" prefHeight="500.0" prefWidth="1100.0">
                <content>
-                  <TilePane alignment="CENTER">
+                  <TilePane alignment="CENTER" prefHeight="500.0" prefWidth="1100.0">
                      <children>
-                        <AnchorPane>
+                        <AnchorPane prefHeight="500.0" prefWidth="1100.0">
                            <children>
-                              <ImageView fitWidth="1100.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="500.0" fitWidth="1100.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@images/datapath-Recovered.png" />
                                  </image>
