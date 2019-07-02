@@ -12,6 +12,8 @@ public class ControlUnit {
     Signal MEMWRITE;
     Signal HALT;
 
+    Signal machineError;
+
     public ControlUnit() {
         REGDES = new Signal(0);
         REGWRITE = new Signal(0);
@@ -23,6 +25,7 @@ public class ControlUnit {
         MEMWRITE = new Signal(0);
         MEMTOREG = new Signal(0);
         HALT = new Signal(0);
+        machineError = new Signal(0);
     }
 
     public void setup(String oppCode) {
@@ -32,6 +35,11 @@ public class ControlUnit {
                 ALUOP.data = 1;
                 REGDES.data = 1;
                 REGWRITE.data = 1;
+                break;
+            case "0101":        //addi
+                ALUOP.data = 1;
+                REGWRITE.data = 1;
+                ALUSRC.data = 1;
                 break;
             case "0001":        //sub
                 ALUOP.data = 2;
@@ -75,8 +83,12 @@ public class ControlUnit {
             case "1110":        //halt
                 HALT.data = 1;
                 break;
+            default:
+                machineError.data = 1;
+                break;
         }
     }
+
     private void resetSignals() {
         REGDES.data = 0;
         REGWRITE.data = 0;

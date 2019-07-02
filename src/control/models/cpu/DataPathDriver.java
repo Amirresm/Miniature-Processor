@@ -266,5 +266,7 @@ public class DataPathDriver {
         this.HALT.data = 0;
         this.stageIndicator = 0;
         getRegisterFile().resizeMemory(getRegisterFile().getMemSize());
+
+        controlUnit.machineError.data = 0;
     }
 }
