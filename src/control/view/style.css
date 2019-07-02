@@ -1,3 +1,11 @@
+.base-bg {
+    -fx-background-color: #def2f1;
+}
+
+.map-bg {
+    -fx-background-color: #779587;
+}
+
 .banner-deactive {
     -fx-font-size: 16;
     -fx-font-weight: bold;

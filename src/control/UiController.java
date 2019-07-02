@@ -8,7 +8,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -44,6 +43,9 @@ public class UiController {
     private int memoryWatcher = 0;
 
     //================================================
+
+    @FXML
+    private Button nextStageBt;
 
     @FXML
     private  Label errorBanner;
@@ -244,7 +246,7 @@ public class UiController {
     private Label mMemoryWriteLb;
 
     @FXML
-    private Button nextBt;
+    private Button runBt;
 
     @FXML
     private Label mReadRegLb;
@@ -374,21 +376,26 @@ public class UiController {
     }
 
     @FXML
-    void nextBtAction(ActionEvent event) {
+    void runBtAction(ActionEvent event) {
         if (isWorking) {
             timer.cancel();
             timer.purge();
-            nextBt.setText("Run");
+            runBt.setText("Run");
             isWorking = false;
         } else {
             int delay = 500;
             if (!delayTf.getText().trim().isEmpty())
                 delay = Integer.parseInt(delayTf.getText());
             startDriverTimer(delay);
-            nextBt.setText("Stop");
+            runBt.setText("Stop");
             isWorking = true;
 
         }
+    }
+
+    @FXML
+    void nextStageBtAction(ActionEvent event) {
+        drive();
     }
 
     private void startDriverTimer(int delay) {
@@ -423,7 +430,7 @@ public class UiController {
             timer.cancel();
             timer.purge();
             Platform.runLater(() -> {
-                nextBt.setText("Run");
+                runBt.setText("Run");
                 enableHaltBanner(true);
             });
             enableBanner(-1);
@@ -432,7 +439,7 @@ public class UiController {
             timer.cancel();
             timer.purge();
             Platform.runLater(() -> {
-                nextBt.setText("Run");
+                runBt.setText("Run");
                 enableErrorBanner(true);
             });
             enableBanner(-1);
